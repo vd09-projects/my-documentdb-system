@@ -17,7 +17,7 @@ A Go + MongoDB application that demonstrates:
 4. [Running the Project (Local & Docker)](#running-the-project-local--docker)
 5. [Usage Flow](#usage-flow)
 6. [Future Improvements](#future-improvements)
-7. [License](#license)
+7. [Flow Diagram](#flow-diagram)
 
 ---
 
@@ -95,15 +95,15 @@ make docker-run  # Starts server and docker
 ```
 
 ### 2. MongoDB Shell (Optional)
-    - If you need to interact with the MongoDB instance directly, you can open a mongosh session inside the my-mongo-db container:
+If you need to interact with the MongoDB instance directly, you can open a mongosh session inside the my-mongo-db container:
 ```bash
-        make mongo-shell
+ make mongo-shell
 ```
-    Once inside the shell, you can run commands like:
+Once inside the shell, you can run commands like:
 ```bash
-        use myDB
-        db.valid_records.find().pretty()
-        db.quarantine_records.find().pretty()
+- use myDB
+- db.valid_records.find().pretty()
+- db.quarantine_records.find().pretty()
 ```
 
 ---
@@ -179,3 +179,6 @@ make docker-run  # Starts server and docker
    - Load secrets from environment variables or a secrets manager (Vault, AWS Secret Manager, etc.).
    - Configure HTTPS certificates.
    - Add logging (structured logs) and monitoring (Prometheus/Grafana).
+
+## Flow Diagram
+![ezcv logo](https://img.plantuml.biz/plantuml/png/fPLHRzis4CVVzIbkVZ1iB6asO4_6t3QEcY35qcHst3LOXvgbpZ9HcjH8oeQ7VVWTpveh4qeG87wnHDxzoV_lZjHR7uGBzLfd5VqhgIfX0imzkgE1tiJPBGt2_Be7mjFVyVILXHcw3JgUvST4uCQQqkOJdiydMJOUmnHBvGE9NcgxXV4uYyl2wMjI7y5jXGREtFyXbIWncr_JRAC-WhlRsNqhOb1JjX5hFA5WxxVM5SECOrapdupWsb1808DRYC6W32pYWr-0j5gZ3CgQB9_0QMkPMIqbUdzsAPG-w3MRxF6EfKCHi02_ZrpMMkz-w85rWCvPnrv_iwKoJnZLFF-eIvv-ZiMFGgj214mDfguu3cmCsV0ZcIZG12MqJrrECTJEmFi_xY7ORqZxK4lWh25xEw_3AgPAfd3E57rgyyxPZIgmhUA3fKNZ9hMLGi_ebVmF4m23A6-T-aT4tH5CK3YI_Vmhgtn-lT_3lD9M592B8DALFuYDAYEIO9kmJiJrNc5mCVjuzdvs-m5-18UI4D_lAjgKqA61nkjcGB_ExYBwWi4peIzx3R-8h1T_ry898cNmCDuXDA-uWejzo9UbGXq5jYgie51UsWr6Rljnpa-As-p4eQzru82qRsUjLWN5uQJugN7iUnbgZwIpIHodEh_yz3FCZMWgX0Kbce8BaWk_-cg58w9N6E1cnxKPFbMSGqfIdwjtiJoK51NUB9rTZn_eTtfpSvhd_M1RRyyeq-yrkXsarVcwunDpdKCVcBuJfiGkkDDzIXSERXkk_zAwbfqNmpmlIuU4oRed-BMYkW1gvSFqqD3-6QIcA8gq2zbPGLBAoD0w89rzYA_AL_1dpmkDldS2FMKsQ89rkzvVNG3kR5LhPd-GXSBPgh1RyqA6RMGpr7YqzyTeNRBbDzy3nv-Is_OIWrmr1n64SsB7VFZkxRTjnAPDKMRTj2gd94PQT5cOe4A4zHYelT81qh7FYvMr7c70DaxYTyRn5Jey0QcL_0ONGalMwG8WccR28_zzNd7yqBVLUE3hzRzYWtnfTu8nzHh93L3HQlGDXEJW3LWH7bA5EtI4SWsqo5cp22W3qXPaoJgeL8LQ6HnsVwsQom-4vrF9f-YTAVZuiDb8QWIvyfMcgeLLX6c4RlByuUljixTeYdgj_mC0)
