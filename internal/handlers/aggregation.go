@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -86,7 +87,13 @@ func AggregateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Use the RecordDB interface for database logic
 	metadataDB := db.NewRecordDB(db.MongoClient, db.DatabaseName)
-	result, err := metadataDB.AggregateData(ctx, userID, recordType, field, op)
+	result, err := metadataDB.AggregateData(ctx, userID, recordType, field)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	aggregateResult, err := aggregateResultsFromDB(result, op)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -94,5 +101,45 @@ func AggregateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Return the computed result
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(bson.M{"result": result})
+	json.NewEncoder(w).Encode(bson.M{"result": aggregateResult})
+}
+
+func aggregateResultsFromDB(data []float64, op string) (float64, error) {
+	// Perform the specified aggregation operation
+	var result float64
+	switch op {
+	case "sum":
+		for _, v := range data {
+			result += v
+		}
+	case "average":
+		if len(data) > 0 {
+			for _, v := range data {
+				result += v
+			}
+			result /= float64(len(data))
+		}
+	case "min":
+		if len(data) > 0 {
+			result = data[0]
+			for _, v := range data {
+				if v < result {
+					result = v
+				}
+			}
+		}
+	case "max":
+		if len(data) > 0 {
+			result = data[0]
+			for _, v := range data {
+				if v > result {
+					result = v
+				}
+			}
+		}
+	default:
+		return 0, fmt.Errorf("invalid operation: %s", op)
+	}
+
+	return result, nil
 }

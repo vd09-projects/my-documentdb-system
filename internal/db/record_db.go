@@ -214,7 +214,7 @@ func (m *RecordDB) GetFieldsForUserAndType(ctx context.Context, userID string, r
 	return results[0], nil
 }
 
-func (m *RecordDB) AggregateData(ctx context.Context, userID, recordType, field, op string) (float64, error) {
+func (m *RecordDB) AggregateData(ctx context.Context, userID, recordType, field string) ([]float64, error) {
 	// Build the base filter
 	filter := bson.M{
 		"userID":     userID,
@@ -224,14 +224,14 @@ func (m *RecordDB) AggregateData(ctx context.Context, userID, recordType, field,
 	// Fetch raw data from MongoDB
 	cursor, err := m.validColl.Find(ctx, filter)
 	if err != nil {
-		return 0, fmt.Errorf("failed to fetch data: %w", err)
+		return []float64{}, fmt.Errorf("failed to fetch data: %w", err)
 	}
 	defer cursor.Close(ctx)
 
 	// Parse the results into a slice of bson.M
 	var results []bson.M
 	if err := cursor.All(ctx, &results); err != nil {
-		return 0, fmt.Errorf("failed to read data: %w", err)
+		return []float64{}, fmt.Errorf("failed to read data: %w", err)
 	}
 
 	// Apply aggregation in code
@@ -248,51 +248,14 @@ func (m *RecordDB) AggregateData(ctx context.Context, userID, recordType, field,
 		case string:
 			floatValue, err := strconv.ParseFloat(v, 64)
 			if err != nil {
-				return 0, fmt.Errorf("failed to convert field value to float: %w", err)
+				return []float64{}, fmt.Errorf("failed to convert field value to float: %w", err)
 			}
 			values = append(values, floatValue)
 		case float64:
 			values = append(values, v)
 		default:
-			return 0, fmt.Errorf("unsupported field value type: %T", v)
+			return []float64{}, fmt.Errorf("unsupported field value type: %T", v)
 		}
 	}
-
-	// Perform the specified aggregation operation
-	var result float64
-	switch op {
-	case "sum":
-		for _, v := range values {
-			result += v
-		}
-	case "average":
-		if len(values) > 0 {
-			for _, v := range values {
-				result += v
-			}
-			result /= float64(len(values))
-		}
-	case "min":
-		if len(values) > 0 {
-			result = values[0]
-			for _, v := range values {
-				if v < result {
-					result = v
-				}
-			}
-		}
-	case "max":
-		if len(values) > 0 {
-			result = values[0]
-			for _, v := range values {
-				if v > result {
-					result = v
-				}
-			}
-		}
-	default:
-		return 0, fmt.Errorf("invalid operation: %s", op)
-	}
-
-	return result, nil
+	return values, nil
 }
