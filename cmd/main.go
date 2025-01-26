@@ -21,7 +21,8 @@ func main() {
 
 	// Protected routes
 	http.Handle("/upload", handlers.AuthMiddleware(http.HandlerFunc(handlers.UploadHandler)))
-	http.Handle("/data", handlers.AuthMiddleware(http.HandlerFunc(handlers.GetAllDataHandler)))
+	// http.Handle("/data", handlers.AuthMiddleware(http.HandlerFunc(handlers.GetAllDataHandler)))
+	http.Handle("/userData", handlers.AuthMiddleware(http.HandlerFunc(handlers.GetUserDataHandler)))
 
 	log.Println("Server running on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

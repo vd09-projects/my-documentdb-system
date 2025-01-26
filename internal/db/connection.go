@@ -10,9 +10,11 @@ import (
 )
 
 var MongoClient *mongo.Client
-var DatabaseName = "myDB"
-var CollectionValid = "valid_records"
-var CollectionQuarantine = "quarantine_records"
+
+const DatabaseName = "myDB"
+const ValidCollection = "valid_records"
+const QuarantineCollection = "quarantine_records"
+const UsersCollection = "users"
 
 func ConnectMongoDB(uri string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

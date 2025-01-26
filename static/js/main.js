@@ -1,10 +1,11 @@
-// Production-Ready Code with Modularized Functions
+// js/main.js
 document.addEventListener("DOMContentLoaded", () => {
   // Cached DOM elements
   const navElements = {
     login: document.getElementById("navLogin"),
     register: document.getElementById("navRegister"),
     upload: document.getElementById("navUpload"),
+    dashboard: document.getElementById("navDashboard"), // DASHBOARD CHANGES
     logout: document.getElementById("navLogout"),
   };
 
@@ -12,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     login: document.getElementById("loginSection"),
     register: document.getElementById("registerSection"),
     upload: document.getElementById("uploadSection"),
+    dashboard: document.getElementById("dashboardSection"), // DASHBOARD CHANGES
   };
 
   const forms = {
@@ -27,6 +29,14 @@ document.addEventListener("DOMContentLoaded", () => {
     uploadInfo: document.getElementById("uploadInfo"),
   };
 
+  // DASHBOARD CHANGES
+  const dashboardElements = {
+    fromDate: document.getElementById("fromDate"),
+    toDate: document.getElementById("toDate"),
+    getDataButton: document.getElementById("getDataButton"),
+    resultsDiv: document.getElementById("dashboardResults"),
+  };
+
   // Utility function to update UI based on login state
   function updateUI() {
     const token = localStorage.getItem("jwtToken");
@@ -34,12 +44,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (token) {
       navElements.logout.style.display = "inline-block";
       navElements.upload.style.display = "inline-block";
+      navElements.dashboard.style.display = "inline-block"; // Show Dashboard if logged in
       navElements.login.style.display = "none";
       navElements.register.style.display = "none";
     } else {
       navElements.login.style.display = "inline-block";
       navElements.register.style.display = "inline-block";
       navElements.upload.style.display = "none";
+      navElements.dashboard.style.display = "none"; // Hide Dashboard if not logged in
       navElements.logout.style.display = "none";
     }
   }
@@ -51,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Handle navigation click events
+  // Navigation click events
   function handleNavClick(navType) {
     switch (navType) {
       case "login":
@@ -62,6 +74,9 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
       case "upload":
         handleUploadNav();
+        break;
+      case "dashboard": // DASHBOARD CHANGES
+        handleDashboardNav();
         break;
       case "logout":
         handleLogout();
@@ -81,6 +96,17 @@ document.addEventListener("DOMContentLoaded", () => {
     messages.uploadInfo.textContent = `You are logged in. Token: ${token}`;
   }
 
+  // DASHBOARD CHANGES: Show the Dashboard section
+  function handleDashboardNav() {
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      alert("Please log in first!");
+      return;
+    }
+    showSection("dashboard");
+    dashboardElements.resultsDiv.innerHTML = ""; // clear old results
+  }
+
   function handleLogout() {
     localStorage.removeItem("jwtToken");
     alert("You have been logged out!");
@@ -88,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showSection("login");
   }
 
-  // Handle form submissions
+  // --- Forms: LOGIN ---
   async function handleLoginSubmit(event) {
     event.preventDefault();
     messages.login.textContent = "";
@@ -114,6 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- Forms: REGISTER ---
   async function handleRegisterSubmit(event) {
     event.preventDefault();
     messages.register.textContent = "";
@@ -137,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- Forms: UPLOAD ---
   async function handleUploadSubmit(event) {
     event.preventDefault();
     messages.uploadResponse.textContent = "";
@@ -165,16 +193,72 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- DASHBOARD CHANGES: GET DATA ---
+  async function handleGetDataClick() {
+    // Grab optional date strings
+    const from = dashboardElements.fromDate.value.trim();
+    const to = dashboardElements.toDate.value.trim();
+
+    // Build the URL with optional query params
+    let url = "/userData";
+    const params = [];
+    if (from) params.push(`from=${from}`);
+    if (to) params.push(`to=${to}`);
+    if (params.length > 0) {
+      url += "?" + params.join("&");
+    }
+
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      alert("You are not logged in!");
+      return;
+    }
+
+    try {
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+      const data = await res.json();
+      displayDashboardData(data);
+    } catch (err) {
+      console.error("Error fetching user data:", err.message);
+      dashboardElements.resultsDiv.innerHTML = `<p style="color:red;">${err.message}</p>`;
+    }
+  }
+
+  // --- DASHBOARD CHANGES: Display results ---
+  function displayDashboardData(data) {
+    // For a quick demonstration, we can just JSON.stringify the data
+    // or build a table, etc.
+    if (!data || data.length === 0) {
+      dashboardElements.resultsDiv.innerHTML = "<p>No records found.</p>";
+      return;
+    }
+
+    // Example: A minimal approach
+    dashboardElements.resultsDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+  }
+
   // Attach event listeners
   function attachEventListeners() {
     navElements.login.addEventListener("click", () => handleNavClick("login"));
     navElements.register.addEventListener("click", () => handleNavClick("register"));
     navElements.upload.addEventListener("click", () => handleNavClick("upload"));
+    navElements.dashboard.addEventListener("click", () => handleNavClick("dashboard")); // DASHBOARD CHANGES
     navElements.logout.addEventListener("click", () => handleNavClick("logout"));
 
     forms.login.addEventListener("submit", handleLoginSubmit);
     forms.register.addEventListener("submit", handleRegisterSubmit);
     forms.upload.addEventListener("submit", handleUploadSubmit);
+
+    // DASHBOARD CHANGES: button to fetch data
+    dashboardElements.getDataButton.addEventListener("click", handleGetDataClick);
   }
 
   // Initialize application

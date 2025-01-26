@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"time"
 
@@ -24,7 +23,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	database := db.NewMongoDB(db.MongoClient, db.DatabaseName)
+	database := db.NewRecordDB(db.MongoClient, db.DatabaseName)
 
 	fileName := fileHeader.Filename
 	parser := parsers.GetParser(fileName, database)
@@ -44,24 +43,4 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	parser.Parse(ctx, file, w, claims.UserID)
-}
-
-func GetAllDataHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	database := db.NewMongoDB(db.MongoClient, db.DatabaseName)
-	results, err := database.GetAllValidData(ctx)
-	if err != nil {
-		http.Error(w, "Failed to query data", http.StatusInternalServerError)
-		return
-	}
-
-	resp, err := json.Marshal(results)
-	if err != nil {
-		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(resp)
 }

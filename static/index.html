@@ -7,10 +7,11 @@
 </head>
 <body>
   <nav>
-    <!-- The ID-based approach allows JS to show/hide these elements easily -->
+        <!-- The ID-based approach allows JS to show/hide these elements easily -->
     <button id="navLogin">Login</button>
     <button id="navRegister">Register</button>
     <button id="navUpload">Upload</button>
+    <button id="navDashboard">Dashboard</button>
     <button id="navLogout">Logout</button>
   </nav>
 
@@ -59,6 +60,21 @@
       <button type="submit">Upload</button>
     </form>
     <div id="uploadResponse"></div>
+  </section>
+
+  <!-- DASHBOARD SECTION --> <!-- DASHBOARD CHANGES -->
+  <section id="dashboardSection" style="display:none;">
+    <h2>My Dashboard</h2>
+    <p>You can optionally enter a date range (YYYY-MM-DD) to filter your data:</p>
+    <label for="fromDate">From:</label>
+    <input type="text" id="fromDate" placeholder="YYYY-MM-DD" />
+    <label for="toDate">To:</label>
+    <input type="text" id="toDate" placeholder="YYYY-MM-DD" />
+    <button id="getDataButton">Get My Data</button>
+
+    <div id="dashboardResults">
+      <!-- We’ll dynamically place fetched results here. -->
+    </div>
   </section>
 
   <script src="js/main.js"></script>

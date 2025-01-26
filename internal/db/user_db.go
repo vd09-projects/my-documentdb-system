@@ -9,8 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const UsersCollection = "users"
-
 type UserDB struct {
 	coll *mongo.Collection
 }
