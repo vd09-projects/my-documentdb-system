@@ -1,0 +1,11 @@
+brew install mongosh
+
+docker exec -it my-mongo-db bash
+mongosh
+use myDB
+
+db.valid_records.find().pretty()
+db.quarantine_records.find().pretty()
+db.valid_records.deleteMany({})
+
+vd - qwert12

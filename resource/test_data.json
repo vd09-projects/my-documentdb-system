@@ -1,0 +1,17 @@
+[
+    {
+      "userId": 12345,
+      "purchases": [
+        {"productName": "Widget A", "quantity": 10, "price": 19.99},
+        {"productName": "Widget B", "quantity": 5, "price": 9.99}
+      ]
+    },
+    {
+      "userId": 67890,
+      "purchases": [
+        {"productName": "Gadget X", "quantity": 3, "price": 15.50},
+        {"productName": "Widget B", "quantity": 12, "price": 9.99}
+      ]
+    }
+  ]
+  

@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - MONGO_URI=mongodb://db:27017
+    container_name: my-data-app
+
+  db:
+    image: mongo:6
+    container_name: my-mongo-db
+    ports:
+      - "27017:27017"
