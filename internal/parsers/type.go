@@ -10,7 +10,7 @@ import (
 )
 
 type Parser interface {
-	Parse(ctx context.Context, file io.Reader, w http.ResponseWriter, userID string)
+	Parse(ctx context.Context, file io.Reader, w http.ResponseWriter, userID string, recordType string)
 }
 
 func GetParser(fileName string, database db.Database) Parser {

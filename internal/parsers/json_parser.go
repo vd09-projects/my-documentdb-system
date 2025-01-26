@@ -15,7 +15,7 @@ type JSONParser struct {
 	database db.Database
 }
 
-func (p *JSONParser) Parse(ctx context.Context, file io.Reader, w http.ResponseWriter, userID string) {
+func (p *JSONParser) Parse(ctx context.Context, file io.Reader, w http.ResponseWriter, userID string, recordType string) {
 	dataBytes, err := io.ReadAll(file)
 	if err != nil {
 		http.Error(w, "Failed to read JSON file", http.StatusInternalServerError)
@@ -28,24 +28,24 @@ func (p *JSONParser) Parse(ctx context.Context, file io.Reader, w http.ResponseW
 	if err := json.Unmarshal(dataBytes, &jsonRecords); err == nil {
 		for _, rec := range jsonRecords {
 			if !utils.IsValidRecord(rec) {
-				p.database.InsertToQuarantine(ctx, rec, userID, "Failed validation")
+				p.database.InsertToQuarantine(ctx, rec, userID, recordType, "Failed validation")
 				quarantineCount++
 				continue
 			}
-			p.database.InsertToValid(ctx, rec, userID)
+			p.database.InsertToValid(ctx, rec, userID, recordType)
 			insertCount++
 		}
 	} else {
 		var singleRec map[string]interface{}
 		if err := json.Unmarshal(dataBytes, &singleRec); err != nil {
-			p.database.InsertToQuarantine(ctx, string(dataBytes), userID, "Invalid JSON structure")
+			p.database.InsertToQuarantine(ctx, string(dataBytes), userID, recordType, "Invalid JSON structure")
 			quarantineCount++
 		} else {
 			if !utils.IsValidRecord(singleRec) {
-				p.database.InsertToQuarantine(ctx, singleRec, userID, "Failed validation")
+				p.database.InsertToQuarantine(ctx, singleRec, userID, recordType, "Failed validation")
 				quarantineCount++
 			} else {
-				p.database.InsertToValid(ctx, singleRec, userID)
+				p.database.InsertToValid(ctx, singleRec, userID, recordType)
 				insertCount++
 			}
 		}

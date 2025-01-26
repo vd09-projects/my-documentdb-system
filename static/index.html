@@ -12,6 +12,7 @@
     <button id="navRegister">Register</button>
     <button id="navUpload">Upload</button>
     <button id="navDashboard">Dashboard</button>
+    <button id="navAggregator">Aggregator</button>
     <button id="navLogout">Logout</button>
   </nav>
 
@@ -55,6 +56,15 @@
   <section id="uploadSection" style="display:none;">
     <h2>Upload Data</h2>
     <p id="uploadInfo"></p>
+
+    <!-- New: Record Type selection -->
+    <label for="recordType">Record Type:</label>
+    <select id="recordType" name="recordType">
+      <option value="sales">Sales</option>
+      <option value="inventory">Inventory</option>
+      <!-- You can make this dynamic or keep it simple for now. -->
+    </select>
+
     <form id="uploadForm" enctype="multipart/form-data">
       <input type="file" name="datafile" accept=".csv, application/json" />
       <button type="submit">Upload</button>
@@ -75,6 +85,30 @@
     <div id="dashboardResults">
       <!-- We’ll dynamically place fetched results here. -->
     </div>
+  </section>
+
+  <!-- SEPARATE AGGREGATOR SECTION -->
+  <section id="aggregatorSection" style="display:none;">
+    <h2>Aggregator</h2>
+    <p>Select a record type, choose a field, then pick an operation (SUM or AVERAGE).</p>
+
+    <label for="aggRecordType">Record Type:</label>
+    <select id="aggRecordType">
+      <option value="" disabled selected>Select a record type</option>
+    </select>
+
+    <label for="aggField">Field:</label>
+    <select id="aggField"></select>
+
+    <label for="aggOperation">Operation:</label>
+    <select id="aggOperation">
+      <option value="sum">SUM</option>
+      <option value="average">AVERAGE</option>
+    </select>
+
+    <button id="calculateButton">Calculate</button>
+
+    <div id="aggResult"></div>
   </section>
 
   <script src="js/main.js"></script>

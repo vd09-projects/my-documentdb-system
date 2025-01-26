@@ -14,6 +14,7 @@ var MongoClient *mongo.Client
 const DatabaseName = "myDB"
 const ValidCollection = "valid_records"
 const QuarantineCollection = "quarantine_records"
+const RecordFieldsCollection = "record_fields"
 const UsersCollection = "users"
 
 func ConnectMongoDB(uri string) {

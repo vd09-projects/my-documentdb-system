@@ -42,5 +42,11 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	parser.Parse(ctx, file, w, claims.UserID)
+	recordType := r.FormValue("recordType")
+	if recordType == "" {
+		http.Error(w, "Record type is required", http.StatusBadRequest)
+		return
+	}
+
+	parser.Parse(ctx, file, w, claims.UserID, recordType)
 }

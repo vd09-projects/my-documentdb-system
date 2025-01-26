@@ -24,6 +24,10 @@ func main() {
 	// http.Handle("/data", handlers.AuthMiddleware(http.HandlerFunc(handlers.GetAllDataHandler)))
 	http.Handle("/userData", handlers.AuthMiddleware(http.HandlerFunc(handlers.GetUserDataHandler)))
 
+	http.Handle("/listRecordTypes", handlers.AuthMiddleware(http.HandlerFunc(handlers.ListRecordTypesHandler)))
+	http.Handle("/listFields", handlers.AuthMiddleware(http.HandlerFunc(handlers.ListFieldsHandler)))
+	http.Handle("/aggregate", handlers.AuthMiddleware(http.HandlerFunc(handlers.AggregateHandler)))
+
 	log.Println("Server running on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

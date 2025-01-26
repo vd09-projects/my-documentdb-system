@@ -16,7 +16,7 @@ type CSVParser struct {
 	database db.Database
 }
 
-func (p *CSVParser) Parse(ctx context.Context, file io.Reader, w http.ResponseWriter, userID string) {
+func (p *CSVParser) Parse(ctx context.Context, file io.Reader, w http.ResponseWriter, userID string, recordType string) {
 	fmt.Println("Parse in CSVParser")
 	reader := csv.NewReader(bufio.NewReader(file))
 	headers, err := reader.Read()
@@ -33,25 +33,25 @@ func (p *CSVParser) Parse(ctx context.Context, file io.Reader, w http.ResponseWr
 			break
 		}
 		if err != nil {
-			p.database.InsertToQuarantine(ctx, record, userID, "Error reading CSV")
+			p.database.InsertToQuarantine(ctx, record, userID, recordType, "Error reading CSV")
 			quarantineCount++
 			continue
 		}
 
 		if len(record) != len(headers) {
-			p.database.InsertToQuarantine(ctx, record, userID, "Mismatched header and record lengths")
+			p.database.InsertToQuarantine(ctx, record, userID, recordType, "Mismatched header and record lengths")
 			quarantineCount++
 			continue
 		}
 
 		data := mapRowToKeyValue(headers, record)
 		if !utils.IsValidRecord(data) {
-			p.database.InsertToQuarantine(ctx, record, userID, "Failed validation")
+			p.database.InsertToQuarantine(ctx, record, userID, recordType, "Failed validation")
 			quarantineCount++
 			continue
 		}
 
-		p.database.InsertToValid(ctx, data, userID)
+		p.database.InsertToValid(ctx, data, userID, recordType)
 		insertCount++
 	}
 

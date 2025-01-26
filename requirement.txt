@@ -4,8 +4,10 @@ docker exec -it my-mongo-db bash
 mongosh
 use myDB
 
+db.record_fields.find().pretty()
 db.valid_records.find().pretty()
 db.quarantine_records.find().pretty()
 db.valid_records.deleteMany({})
+show collections
 
 vd - qwert12

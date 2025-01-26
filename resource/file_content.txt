@@ -1,3 +1,125 @@
+File: ./static/index.html
+Content:
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Data System - UI</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav>
+        <!-- The ID-based approach allows JS to show/hide these elements easily -->
+    <button id="navLogin">Login</button>
+    <button id="navRegister">Register</button>
+    <button id="navUpload">Upload</button>
+    <button id="navDashboard">Dashboard</button>
+    <button id="navAggregator">Aggregator</button>
+    <button id="navLogout">Logout</button>
+  </nav>
+
+  <h1>Welcome to the Data System</h1>
+
+  <!-- LOGIN SECTION -->
+  <section id="loginSection" style="display:none;">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <div>
+        <label for="loginUsername">Username:</label>
+        <input type="text" id="loginUsername" required>
+      </div>
+      <div>
+        <label for="loginPassword">Password:</label>
+        <input type="password" id="loginPassword" required>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+    <div id="loginMessage"></div>
+  </section>
+
+  <!-- REGISTER SECTION -->
+  <section id="registerSection" style="display:none;">
+    <h2>Register</h2>
+    <form id="registerForm">
+      <div>
+        <label for="registerUsername">Username:</label>
+        <input type="text" id="registerUsername" required>
+      </div>
+      <div>
+        <label for="registerPassword">Password:</label>
+        <input type="password" id="registerPassword" required>
+      </div>
+      <button type="submit">Register</button>
+    </form>
+    <div id="registerMessage"></div>
+  </section>
+
+  <!-- UPLOAD SECTION -->
+  <section id="uploadSection" style="display:none;">
+    <h2>Upload Data</h2>
+    <p id="uploadInfo"></p>
+
+    <!-- New: Record Type selection -->
+    <label for="recordType">Record Type:</label>
+    <select id="recordType" name="recordType">
+      <option value="sales">Sales</option>
+      <option value="inventory">Inventory</option>
+      <!-- You can make this dynamic or keep it simple for now. -->
+    </select>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+      <input type="file" name="datafile" accept=".csv, application/json" />
+      <button type="submit">Upload</button>
+    </form>
+    <div id="uploadResponse"></div>
+  </section>
+
+  <!-- DASHBOARD SECTION --> <!-- DASHBOARD CHANGES -->
+  <section id="dashboardSection" style="display:none;">
+    <h2>My Dashboard</h2>
+    <p>You can optionally enter a date range (YYYY-MM-DD) to filter your data:</p>
+    <label for="fromDate">From:</label>
+    <input type="text" id="fromDate" placeholder="YYYY-MM-DD" />
+    <label for="toDate">To:</label>
+    <input type="text" id="toDate" placeholder="YYYY-MM-DD" />
+    <button id="getDataButton">Get My Data</button>
+
+    <div id="dashboardResults">
+      <!-- We’ll dynamically place fetched results here. -->
+    </div>
+  </section>
+
+  <!-- SEPARATE AGGREGATOR SECTION -->
+  <section id="aggregatorSection" style="display:none;">
+    <h2>Aggregator</h2>
+    <p>Select a record type, choose a field, then pick an operation (SUM or AVERAGE).</p>
+
+    <label for="aggRecordType">Record Type:</label>
+    <select id="aggRecordType">
+      <option value="" disabled selected>Select a record type</option>
+    </select>
+
+    <label for="aggField">Field:</label>
+    <select id="aggField"></select>
+
+    <label for="aggOperation">Operation:</label>
+    <select id="aggOperation">
+      <option value="sum">SUM</option>
+      <option value="average">AVERAGE</option>
+    </select>
+
+    <button id="calculateButton">Calculate</button>
+
+    <div id="aggResult"></div>
+  </section>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
+---------------------------------------
+Entering Directory: ./static/js
+File: ./static/js/main.js
+Content:
 // js/main.js
 document.addEventListener("DOMContentLoaded", () => {
   // Cached DOM elements
@@ -139,8 +261,8 @@ document.addEventListener("DOMContentLoaded", () => {
     showSection("aggregator");
     aggregatorElements.resultDiv.textContent = "";
 
-    // Load record types so user can pick them
-    loadRecordTypes();
+    // // Load record types so user can pick them
+    // loadRecordTypes();
   }
 
   // --- Forms: LOGIN ---
@@ -296,8 +418,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Populate the dropdown with the received record types
       types.forEach((type) => {
         const option = document.createElement("option");
-        option.value = type.recordType; // Use `type` as the value
-        option.textContent = type.recordType; // Display `type` as the text
+        option.value = type; // Use `type` as the value
+        option.textContent = type; // Display `type` as the text
         aggregatorElements.recordType.appendChild(option);
       });
   
@@ -305,57 +427,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       console.error("Error loading record types:", error);
       alert("Failed to load record types. Please try again.");
-    }
-  }
-
-  // Load fields for the selected record type
-  async function loadFieldsForType(type) {
-    const token = localStorage.getItem("jwtToken");
-    if (!token) return;
-
-    try {
-      const res = await fetch(`/listFields?recordType=${type}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error(await res.text());
-
-      const fields = await res.json(); // e.g. ["price", "quantity"]
-      aggregatorElements.field.innerHTML = "";
-      console.log(fields)
-      fields.fields.forEach((f) => {
-        const opt = document.createElement("option");
-        opt.value = f;
-        opt.textContent = f;
-        aggregatorElements.field.appendChild(opt);
-      });
-    } catch (err) {
-      console.error("Error loading fields:", err.message);
-    }
-  }
-
-  // Perform sum/average on chosen field
-  async function handleCalculate() {
-    const token = localStorage.getItem("jwtToken");
-    if (!token) {
-      alert("You are not logged in!");
-      return;
-    }
-
-    const recordType = aggregatorElements.recordType.value;
-    const field = aggregatorElements.field.value;
-    const op = aggregatorElements.operation.value;
-
-    const url = `/aggregate?recordType=${recordType}&field=${field}&op=${op}`;
-    try {
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error(await res.text());
-
-      const data = await res.json(); // { result: someNumber }
-      aggregatorElements.resultDiv.textContent = `Result: ${data.result}`;
-    } catch (err) {
-      aggregatorElements.resultDiv.textContent = `Error: ${err.message}`;
     }
   }
 
@@ -374,14 +445,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // DASHBOARD CHANGES: button to fetch data
     dashboardElements.getDataButton.addEventListener("click", handleGetDataClick);
-
-    // Aggregator
-    if (aggregatorElements.recordType) {
-      aggregatorElements.recordType.addEventListener("change", () => {
-        loadFieldsForType(aggregatorElements.recordType.value);
-      });
-    }
-    aggregatorElements.calculateButton.addEventListener("click", handleCalculate);
   }
 
   // Initialize application
@@ -392,3 +455,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initializeApp();
 });
+---------------------------------------
