@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"time"
 
@@ -106,7 +107,7 @@ func AggregateHandler(w http.ResponseWriter, r *http.Request) {
 
 func aggregateResultsFromDB(data []float64, op string) (float64, error) {
 	// Perform the specified aggregation operation
-	var result float64
+	var result float64 = 0
 	switch op {
 	case "sum":
 		for _, v := range data {
@@ -141,5 +142,5 @@ func aggregateResultsFromDB(data []float64, op string) (float64, error) {
 		return 0, fmt.Errorf("invalid operation: %s", op)
 	}
 
-	return result, nil
+	return math.Round(result*100) / 100, nil
 }

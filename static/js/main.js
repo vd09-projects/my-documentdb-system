@@ -109,7 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     showSection("upload");
-    messages.uploadInfo.textContent = `You are logged in. Token: ${token}`;
   }
 
   // DASHBOARD CHANGES: Show the Dashboard section
@@ -197,25 +196,32 @@ document.addEventListener("DOMContentLoaded", () => {
   async function handleUploadSubmit(event) {
     event.preventDefault();
     messages.uploadResponse.textContent = "";
-
+  
     const token = localStorage.getItem("jwtToken");
     if (!token) {
       messages.uploadResponse.textContent = "You are not logged in!";
       return;
     }
-
+  
+    // 1. Get the chosen record type
+    const recordTypeSelect = document.getElementById("recordType");
+    const selectedRecordType = recordTypeSelect.value;
+  
+    // 2. Prepare the form data
     const formData = new FormData(forms.upload);
-
+    formData.append("recordType", selectedRecordType); // Append extra field
+  
     try {
+      // 3. Upload with record type
       const response = await fetch("/upload", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-
+  
       const text = await response.text();
       if (!response.ok) throw new Error(text);
-
+  
       messages.uploadResponse.textContent = text;
     } catch (error) {
       messages.uploadResponse.textContent = `Upload failed: ${error.message}`;

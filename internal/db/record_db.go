@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/vd09-projects/my-documentdb-system/internal/utils"
@@ -237,25 +236,20 @@ func (m *RecordDB) AggregateData(ctx context.Context, userID, recordType, field 
 	// Apply aggregation in code
 	var values []float64
 	for _, record := range results {
-		// Extract the field value
-		rawValue, ok := record["data"].(bson.M)[field]
+		dataMap, ok := record["data"].(bson.M)
 		if !ok {
-			continue // Skip if the field is not found
+			// If "data" is missing or not a bson.M, just skip
+			continue
 		}
 
-		// Convert the value to float64 if possible
-		switch v := rawValue.(type) {
-		case string:
-			floatValue, err := strconv.ParseFloat(v, 64)
-			if err != nil {
-				return []float64{}, fmt.Errorf("failed to convert field value to float: %w", err)
-			}
-			values = append(values, floatValue)
-		case float64:
-			values = append(values, v)
-		default:
-			return []float64{}, fmt.Errorf("unsupported field value type: %T", v)
+		// Retrieve nested value using the dot-separated "field" path
+		rawValues, ok := utils.GetNestedValue(dataMap, field)
+		if !ok {
+			// Skip if the nested field is not found
+			continue
 		}
+		values = append(values, rawValues...)
 	}
+
 	return values, nil
 }
