@@ -94,7 +94,17 @@ make run         # Runs the Go server locally on :8080
 make docker-run  # Starts server and docker
 ```
 
-### 2. MongoDB Shell (Optional)
+### 2. Accessing via AI
+
+To access the AI system, follow the steps below:
+
+1. Open your browser.
+2. Navigate to the following URL: [http://localhost:8080/](http://localhost:8080/)
+3. The link will direct you to the user interface (UI) where you can interact with the system.
+
+Ensure that the application is running locally before accessing the URL.
+
+### 3. MongoDB Shell (Optional)
 If you need to interact with the MongoDB instance directly, you can open a mongosh session inside the my-mongo-db container:
 ```bash
  make mongo-shell
